@@ -7,6 +7,7 @@ class Device < ActiveRecord::Base
   def to_siren
     DeviceSerializer.new(self).to_siren
   end
+  alias_method :to_zetta, :to_siren
 end
 
 class DeviceSerializer < Oat::Serializer
@@ -14,6 +15,7 @@ class DeviceSerializer < Oat::Serializer
 
   schema do
     type ['device', item.type]
+    # TODO do introspection on the model to create the properties 
     property :name, item.name
     property :type, item.type
     property :state, item.state

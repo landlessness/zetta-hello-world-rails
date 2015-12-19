@@ -14,6 +14,7 @@ class DevicesController < ApplicationController
     @device = Device.find(params[:id])
     respond_to do |format|
       format.html # index.html.erb
+      format.zetta { render zetta: @device}
       format.siren { render siren: @device}
     end  
   end
