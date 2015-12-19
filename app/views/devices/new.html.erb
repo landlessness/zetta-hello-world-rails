@@ -17,6 +17,11 @@
 </p>
  
 <p>
+  <%= f.label :message %><br>
+  <%= f.text_field :message %>
+</p>
+
+<p>
   <%= f.label :server %><br>
   <%= f.collection_select(:server_id, Server.all, :id, :name) %>
 </p>
