@@ -1,0 +1,19 @@
+<h1>Devices</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>State</th>
+    <th>Server</th>
+  </tr>
+ 
+  <% @devices.each do |device| %>
+    <tr>
+      <td><%= link_to device.name, server_device_path(device.server, device) %></td>
+      <td><%= device.type %></td>
+      <td><%= device.state %></td>
+      <td><%= link_to device.server.name, server_path(device.server) %></td>
+    </tr>
+  <% end %>
+</table>

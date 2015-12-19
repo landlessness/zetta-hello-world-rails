@@ -1,0 +1,22 @@
+<h1>Device <%= @device.id %></h1>
+
+<p>
+  <strong>Name:</strong>
+  <%= @device.name %>
+</p>
+
+<p>
+  <strong>Type:</strong>
+  <%= @device.type %>
+</p>
+
+<p>
+  <strong>State:</strong>
+  <%= @device.state %>
+</p>
+
+<p>
+  <strong>Server:</strong>
+  <%= link_to @device.server.name, server_path(@device.server) %>
+  
+</p>
