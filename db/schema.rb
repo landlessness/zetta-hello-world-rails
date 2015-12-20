@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 20151219150818) do
   enable_extension "plpgsql"
 
   create_table "devices", force: :cascade do |t|
+    t.string   "message"
     t.string   "name"
     t.string   "type"
     t.string   "state"

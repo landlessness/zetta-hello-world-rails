@@ -2,6 +2,11 @@
 
 <%= form_for :device, url: server_devices_path do |f| %>
 <p>
+  <%= f.label :message %><br>
+  <%= f.text_field :message %>
+</p>
+
+<p>
   <%= f.label :name %><br>
   <%= f.text_field :name %>
 </p>
@@ -16,11 +21,6 @@
   <%= f.text_field :state %>
 </p>
  
-<p>
-  <%= f.label :message %><br>
-  <%= f.text_field :message %>
-</p>
-
 <p>
   <%= f.label :server %><br>
   <%= f.collection_select(:server_id, Server.all, :id, :name) %>
