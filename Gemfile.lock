@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/landlessness/oat.git
+  revision: 14b81179fd4bcbddd76b80beb1da3dbac607bf25
+  branch: siren-multiple-link-rels
+  specs:
+    oat (0.4.6)
+      activesupport
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -73,8 +81,6 @@ GEM
     multi_json (1.11.2)
     nokogiri (1.6.7.1)
       mini_portile2 (~> 2.0.0.rc2)
-    oat (0.4.6)
-      activesupport
     pg (0.18.4)
     puma (2.15.3)
     rack (1.6.4)
@@ -153,7 +159,7 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   jbuilder (~> 2.0)
   jquery-rails
-  oat
+  oat!
   pg
   puma
   rails (= 4.2.5)

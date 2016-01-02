@@ -11,6 +11,7 @@ class DevicesController < ApplicationController
   end
   
   def show
+    logger.info device_params
     @device = Device.find(params[:id])
     respond_to do |format|
       format.html # index.html.erb
@@ -21,15 +22,13 @@ class DevicesController < ApplicationController
         render zetta: @device,
         links: links,
         class: ["device", @device.type],
-        properties: @device.attribute_names.reject{ |k|
-          ['server_id','created_at','updated_at'].include? k
-        }
+        properties: @device.attribute_names
       }
     end  
   end
   
   private
   def device_params
-    params.require(:device).permit(:message, :type, :name, :state)
+    params.permit(:message, :type, :name, :state)
   end
 end

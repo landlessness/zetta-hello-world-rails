@@ -3,9 +3,12 @@ class ZettaSerializer < Oat::Serializer
   adapter Oat::Adapters::Siren
 
   schema do
-    type context[:class]
+    type *context[:class]
     # TODO: fix the nested array on rel: [[up:, 'http://...']]
-    context[:links].each { |l| link *l }
+    context[:links].each do |l| 
+      # link :self, :href => url_for(item.id)
+      link *l
+    end
     map_properties *context[:properties]
   end
   
