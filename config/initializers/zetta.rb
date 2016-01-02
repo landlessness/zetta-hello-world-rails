@@ -28,12 +28,6 @@ class ZettaSerializer < Oat::Serializer
       end
     end
     map_properties *context[:properties]
-    entities context[:entities], item.users do |user, user_serializer|
-      user_serializer.properties do |props|
-        props.name user.name
-        props.email user.email
-      end
-    end
   end
   
   def as_zetta(options)
