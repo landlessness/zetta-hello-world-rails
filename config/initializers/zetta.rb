@@ -1,4 +1,7 @@
 require 'oat/adapters/siren'
+
+# TODO: create three serializers: root, server and device
+
 class ZettaSerializer < Oat::Serializer
   adapter Oat::Adapters::Siren
 
@@ -9,7 +12,28 @@ class ZettaSerializer < Oat::Serializer
       # link :self, :href => url_for(item.id)
       link *l
     end
+    context[:actions].each do |a| 
+      # link :self, :href => url_for(item.id)
+      action a[:name].to_sym do |action|
+        action.class a[:class]
+        action.href a[:href]
+        action.method a[:method]
+        action.type a[:type] if a[:type]
+        a[:fields].each do |field|
+          action.field field[:name].to_sym do |f|
+            f.type field[:type]
+            f.value field[:value] if field[:value]
+          end
+        end
+      end
+    end
     map_properties *context[:properties]
+    entities context[:entities], item.users do |user, user_serializer|
+      user_serializer.properties do |props|
+        props.name user.name
+        props.email user.email
+      end
+    end
   end
   
   def as_zetta(options)

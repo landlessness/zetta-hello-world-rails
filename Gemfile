@@ -52,3 +52,5 @@ ruby "2.2.4"
 gem 'puma'
 
 gem 'oat', :github => 'landlessness/oat', branch: 'siren-multiple-link-rels'
+
+gem 'state_machines-activerecord'
