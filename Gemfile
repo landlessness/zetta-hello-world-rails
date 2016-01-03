@@ -54,3 +54,5 @@ gem 'puma'
 gem 'oat', :github => 'landlessness/oat', branch: 'siren-multiple-link-rels'
 
 gem 'state_machines-activerecord'
+
+gem "rack-cors", require: "rack/cors"
