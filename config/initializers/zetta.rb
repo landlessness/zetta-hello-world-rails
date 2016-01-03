@@ -4,7 +4,7 @@ require 'oat/adapters/siren'
 
 class ZettaSerializer < Oat::Serializer
   adapter Oat::Adapters::Siren
-
+  
   attr_reader :item_controller
 
   def initialize(item, context = {}, _adapter_class = nil, parent_serializer = nil)
@@ -58,6 +58,10 @@ class ZettaSerializer < Oat::Serializer
     # optionally defined by subclasses
   end
 
+  def rels_url(rels_type)
+    'http://rels.zettaapi.org/' + rels_type
+  end
+
 end
 
 class RootSerializer < ZettaSerializer
@@ -75,7 +79,7 @@ class RootSerializer < ZettaSerializer
     link :self,
       href: item_controller.root_url
     item.each do |server|
-      link 'http://rels.zettaapi.org/server',
+      link rels_url('server'),
         title: server.name.to_sym,
         href: item_controller.url_for(server)
     end
@@ -120,7 +124,7 @@ class DeviceSerializer < ZettaSerializer
   def assign_links
     link :self,
       href: item_controller.url_for([item.server, item])
-    link [:up, 'http://rels.zettaapi.org/server'], 
+    link [:up, rels_url('server')], 
       href: item_controller.url_for(item.server),
       title: item.server.name
   end
