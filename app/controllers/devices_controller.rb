@@ -15,14 +15,7 @@ class DevicesController < ApplicationController
     @device = Device.find(params[:id])
     respond_to do |format|
       format.html # index.html.erb
-      format.zetta {
-        # TODO: move headers outta here
-        headers['Access-Control-Allow-Origin'] = '*'
-        headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
-        headers['Access-Control-Request-Method'] = '*'
-        headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-        render zetta: @device, controller: self
-      }
+      format.zetta { render zetta: @device, controller: self }
     end  
   end
   

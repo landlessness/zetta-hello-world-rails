@@ -2,49 +2,140 @@ require 'oat/adapters/siren'
 
 # TODO: create three serializers: root, server and device
 
-class DeviceSerializer < Oat::Serializer
+class ZettaSerializer < Oat::Serializer
   adapter Oat::Adapters::Siren
-  
-  schema do
-    device = item
-    device_controller = context[:controller]
-    
-    # TODO: DRY this up. why do I keep repeating device? block?
-    types device
-    links device, device_controller
-    actions device, device_controller
-    properties device
+
+  attr_reader :item_controller
+
+  def initialize(item, context = {}, _adapter_class = nil, parent_serializer = nil)
+    @item_controller = context[:controller]
+    super
   end
-  
+
   def as_zetta(options)
     to_json
+  end
+
+  protected
+  
+  def assign_links
+    link :self, 
+      href: item_controller.url_for(item)
+  end
+
+  def assign_schema
+    assign_types
+    assign_links
+    assign_actions
+    assign_entities
+    assign_properties
+  end
+
+  def assign_properties
+    map_properties *item.attribute_names
+  end
+
+  def assign_types
+    type item.class.name.underscore
+  end
+
+  def assign_actions(href = item_controller.server_url(item))
+    action :'query-devices' do |action|
+      action.class 'transition'
+      action.href href
+      action.method 'GET'
+      action.type 'application/x-www-form-urlencoded'
+      action.field :ql do |f|
+        f.type :text
+      end
+      action.field :server do |f|
+        f.type :text
+      end
+    end
+  end
+
+  def assign_entities
+    # optionally defined by subclasses
+  end
+
+end
+
+class RootSerializer < ZettaSerializer
+  schema do
+    assign_schema
+  end
+
+  protected
+
+  def assign_types
+    type 'root'
+  end
+
+  def assign_links
+    link :self,
+      href: item_controller.root_url
+    item.each do |server|
+      link 'http://rels.zettaapi.org/server',
+        title: server.name.to_sym,
+        href: item_controller.url_for(server)
+    end
+  end
+  
+  def assign_properties
+    # no op
+  end
+  
+  def assign_actions
+    super(item_controller.root_url)
+  end
+  
+end
+
+class ServerSerializer < ZettaSerializer
+
+  schema do
+    assign_schema
+  end
+
+  protected
+  
+  def assign_entities
+    entities :devices, item.devices, DeviceSerializer, {controller: item_controller}
+  end
+  
+end
+
+class DeviceSerializer < ZettaSerializer
+
+  schema do
+    assign_schema
   end
   
   protected
   
-  def types(device)
-    type device.class.name.underscore, device.type
+  def assign_types
+    type item.class.name.underscore, item.type
   end
   
-  def links(device, device_controller)
-    link :self, 
-      href: device_controller.server_device_url(device.server, device)
+  def assign_links
+    link :self,
+      href: item_controller.url_for([item.server, item])
     link [:up, 'http://rels.zettaapi.org/server'], 
-      href: device_controller.server_url(device.server), 
-      title: device.server.name
+      href: item_controller.url_for(item.server),
+      title: item.server.name
   end
   
-  def actions(device, device_controller)
-    device.state_transitions.each do |state_transition|
+  def assign_actions
+    item.state_transitions.each do |state_transition|
       action state_transition.event do |action|
         action.class 'transition'
-        action.href device_controller.server_device_url(device.server, device)
+        action.href item_controller.server_device_url(item.server, item)
         action.method 'POST'
         action.field :action do |f|
           f.type :hidden
           f.value state_transition.event
         end
-        device.class.instance_method(state_transition.event).parameters.each do |parameter|
+        item.class.instance_method(state_transition.event).parameters.each do |parameter|
           if (:req == parameter.first || :opt == parameter.first)
             action.field parameter[1].to_sym do |f|
               f.type :text
@@ -54,15 +145,17 @@ class DeviceSerializer < Oat::Serializer
       end
     end
   end
-  
-  def properties(device)
-    map_properties *device.attribute_names
-  end
-
 end
-
 
 ActionController::Renderers.add :zetta do |resource, options|
   self.content_type ||= Mime[:zetta]
-  DeviceSerializer.new(resource, options).as_zetta(options)
+  
+  case resource
+  when Device
+    DeviceSerializer.new(resource, options).as_zetta(options)
+  when Server
+    ServerSerializer.new(resource, options).as_zetta(options)
+  when Server::ActiveRecord_Relation
+    RootSerializer.new(resource, options).as_zetta(options)
+  end
 end
